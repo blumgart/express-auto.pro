@@ -1,10 +1,10 @@
 <template>
   <div class="bg-[#F1F2F4]">
-    <!-- <div class="relative">
+    <div class="relative">
       <TheHeader />
 
       <TheHero />
-    </div> -->
+    </div>
 
     <TheAutos />
     <ThePartners />
@@ -12,7 +12,7 @@
     <TheSchemeOfWork />
     <TheReviews />
 
-    <!-- <TheFooter /> -->
+    <TheFooter />
 
     <ModalCallback />
   </div>
