@@ -2,8 +2,9 @@
   <div class="bg-white rounded-xl">
     <div class="relative overflow-hidden rounded-xl group">
       <div class="h-72 md:h-[340px]">
+        <!-- :src="`${config.public.backendUrl}${image}`" -->
         <img
-          :src="`${config.public.backendUrl}${image}`"
+          src="@/assets/images/placeholder.jpg"
           class="transition-all duration-300 group-hover:scale-[1.025] group-hover:blur-sm w-full h-full object-cover"
           alt=""
         />
