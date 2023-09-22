@@ -8,22 +8,34 @@
           class="p-0.5 border-[3px] border-white bg-[url('@/assets/images/form-pattern.svg')] rounded-xl"
         >
           <div class="overflow-hidden rounded-xl">
-            <img src="@/assets/images/form-bg.png" alt="" />
+            <img
+              src="@/assets/images/form-bg.png"
+              alt="Получите бесплатную консультацию"
+            />
           </div>
 
           <div class="px-4 py-6 md:p-8">
             <div class="max-w-lg mx-auto">
-              <span class="block text-2xl text-center uppercase lg:text-4xl">
+              <span
+                class="block text-xl text-center uppercase sm:text-2xl lg:text-4xl"
+              >
                 Получите бесплатную консультацию
               </span>
 
-              <form class="grid mt-8 lg:grid-cols-2 gap-x-6 gap-y-8">
+              <form
+                @submit.prevent="onSubmitForm"
+                class="grid mt-8 lg:grid-cols-2 gap-x-6 gap-y-8"
+              >
                 <div class="relative">
                   <input
                     type="text"
                     id="review-name"
-                    class="block w-full py-2 bg-transparent border-0 border-b border-[#C3C3C3]/50 appearance-none focus:outline-none focus:ring-0 peer"
+                    :class="[
+                      'block w-full py-2 bg-transparent border-0 border-b appearance-none focus:outline-none focus:ring-0 peer',
+                      v$.name.$error ? 'border-red-600' : 'border-[#C3C3C3]/50',
+                    ]"
                     placeholder=" "
+                    v-model="v$.name.$model"
                   />
                   <label
                     for="review-name"
@@ -31,13 +43,22 @@
                   >
                     Имя
                   </label>
+                  <span v-if="v$.name.$error" class="text-xs text-red-600">
+                    Обязательное поле
+                  </span>
                 </div>
                 <div class="relative">
                   <input
                     type="tel"
                     id="review-phone"
-                    class="block w-full py-2 bg-transparent border-0 border-b border-[#C3C3C3]/50 appearance-none focus:outline-none focus:ring-0 peer"
+                    :class="[
+                      'block w-full py-2 bg-transparent border-0 border-b appearance-none focus:outline-none focus:ring-0 peer',
+                      v$.phone.$error
+                        ? 'border-red-600'
+                        : 'border-[#C3C3C3]/50',
+                    ]"
                     placeholder=" "
+                    v-model="v$.phone.$model"
                   />
                   <label
                     for="review-phone"
@@ -45,12 +66,16 @@
                   >
                     Телефон
                   </label>
+                  <span v-if="v$.phone.$error" class="text-xs text-red-600">
+                    Обязательное поле
+                  </span>
                 </div>
                 <div class="relative lg:col-span-2">
                   <textarea
                     id="review-message"
                     placeholder=" "
                     class="block w-full py-2 bg-transparent border-0 border-b border-[#C3C3C3]/50 appearance-none focus:outline-none focus:ring-0 peer resize-y max-h-20"
+                    v-model="v$.message.$model"
                   ></textarea>
                   <label
                     for="review-message"
@@ -61,7 +86,7 @@
                 </div>
                 <div class="-mt-4 lg:col-span-2">
                   <label class="flex items-center">
-                    <input type="checkbox" />
+                    <input type="checkbox" v-model="v$.privacy.$model" />
                     <span class="text-xs text-[#868686] ml-1.5">
                       Нажимая на кнопку, вы соглашаетесь с политикой обработки
                       <a href="#" class="text-black">персональных данных</a>.
@@ -71,7 +96,8 @@
                 <div class="text-center lg:col-span-2">
                   <button
                     type="submit"
-                    class="bg-[#FFD600] px-7 py-4 font-semibold rounded-full"
+                    class="bg-[#FFD600] px-7 py-4 font-semibold rounded-full disabled:cursor-not-allowed disabled:opacity-20"
+                    :disabled="v$.$error"
                   >
                     Связаться со мной
                   </button>
@@ -94,4 +120,43 @@
   </SectionWrapper>
 </template>
 
-<script setup></script>
+<script setup>
+import { useVuelidate } from "@vuelidate/core";
+import { required, sameAs } from "@vuelidate/validators";
+
+const state = reactive({
+  name: "",
+  phone: "",
+  message: "",
+  privacy: false,
+});
+
+const rules = {
+  name: { required },
+  phone: { required },
+  message: {},
+  privacy: { sameAs: sameAs(true) },
+};
+
+const v$ = useVuelidate(rules, state);
+
+const onSubmitForm = async () => {
+  const result = await v$.value.$validate();
+
+  if (!result) {
+    return;
+  }
+
+  await useFetch("/api/email/send", {
+    method: "POST",
+    body: {
+      name: state.name,
+      phone: state.phone,
+      message: state.message,
+    },
+  });
+
+  state.name = state.phone = state.message = "";
+  state.privacy = false;
+};
+</script>

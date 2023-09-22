@@ -10,7 +10,8 @@
         ref="itemsRef"
         :class="[
           `
-          [counter-increment:section] relative 
+          [counter-increment:section] 
+          relative 
           md:before:absolute 
           md:before:-inset-2 
           md:before:bg-white 
@@ -41,7 +42,7 @@
         ]"
       >
         <div
-          class="p-5 lg:p-8 bg-white shadow rounded-xl before:inline-flex before:proportional-nums before:py-2 before:px-5 before:content-['0'_counter(section)] before:text-2xl/none lg:before:text-4xl/none before:border before:border-[#868686] before:rounded-full before:transition before:duration-200 hover:before:text-[#FFD600] hover:before:bg-black"
+          class="p-4 md:p-5 lg:p-8 bg-white shadow rounded-xl before:inline-flex before:proportional-nums before:py-2 before:px-5 before:content-['0'_counter(section)] before:text-2xl/none lg:before:text-4xl/none before:border before:border-[#868686] before:rounded-full before:transition before:duration-200 hover:before:text-[#FFD600] hover:before:bg-black"
         >
           <h2
             v-if="itemIndex === 0"
@@ -60,7 +61,7 @@
       <!-- bg-[url('/schema-bg.svg')] bg-[55%_25%] bg-no-repeat -->
       <!-- class="absolute w-4/5 h-4/5 pointer-events-none z-[-3] top-28 left-48 [&>svg]:w-full [&>svg]:h-full" -->
       <div
-        class="hidden md:block absolute inset-0 pointer-events-none z-[-3] [&>svg]:w-full [&>svg]:h-full"
+        class="hidden md:block absolute w-4/5 h-4/5 pointer-events-none z-[-3] top-28 left-48 [&>svg]:w-full [&>svg]:h-full"
         ref="pathRef"
         v-html="schemaBg"
       ></div>

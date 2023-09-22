@@ -18,7 +18,7 @@
                 :key="c.value"
                 @click="updateCurrentCountry(c)"
                 :class="[
-                  'px-3 lg:px-4 py-1 lg:py-2 rounded-full font-medium',
+                  'px-3 lg:px-4 py-1 lg:py-2 rounded-full font-medium text-sm sm:text-base',
                   { 'bg-[#FFD600]': c.code === currentCountry },
                   { 'text-white': c.code !== currentCountry },
                 ]"
@@ -38,7 +38,7 @@
               @click="updateCurrentType(t)"
               :class="[
                 'flex-1 px-4 py-2 rounded-full font-medium',
-                { 'bg-[#FFD600]': t.value === currentType },
+                { 'bg-[#FFD600]': t.value === currentType.value },
               ]"
             >
               {{ t.name }}
@@ -51,11 +51,14 @@
             class="relative w-full mt-2 text-left sm:hidden"
           >
             <div class="p-1.5 bg-black rounded-full">
-              <HeadlessMenuButton class="flex items-center w-full">
+              <HeadlessMenuButton
+                class="flex items-center w-full relative z-[10]"
+              >
                 <span
-                  class="inline-flex items-center justify-center bg-[#FFD600] rounded-full h-10 w-full"
-                  >VORE</span
+                  class="inline-flex items-center justify-center bg-[#FFD600] rounded-full h-10 w-full text-sm font-semibold"
                 >
+                  {{ currentType.name }}
+                </span>
                 <span
                   class="inline-flex shrink-0 items-center justify-center w-10 h-10 rounded-full bg-[#FFD600] ml-1"
                 >
@@ -78,27 +81,19 @@
               leave-to-class="transform scale-95 opacity-0"
             >
               <HeadlessMenuItems
-                class="absolute left-0 w-full mt-2 bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-[1]"
+                class="absolute left-1.5 w-[calc(100%-3.5rem)] -mt-8 bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-[1]"
               >
-                <div class="px-1 py-1">
-                  <HeadlessMenuItem v-slot="{ active }">
+                <div class="px-1 pb-1 text-sm font-semibold text-center pt-7">
+                  <HeadlessMenuItem
+                    v-for="t in types"
+                    :key="t.value"
+                    v-slot="{ active }"
+                  >
                     <button
-                      :class="[
-                        active ? 'bg-violet-500 text-white' : 'text-gray-900',
-                        'group flex w-full items-center rounded-md px-2 py-2 text-sm',
-                      ]"
+                      @click="updateCurrentType(t)"
+                      class="block w-full px-2 py-2"
                     >
-                      Account settings
-                    </button>
-                  </HeadlessMenuItem>
-                  <HeadlessMenuItem v-slot="{ active }">
-                    <button
-                      :class="[
-                        active ? 'bg-violet-500 text-white' : 'text-gray-900',
-                        'group flex w-full items-center rounded-md px-2 py-2 text-sm',
-                      ]"
-                    >
-                      Documentation
+                      {{ t.name }}
                     </button>
                   </HeadlessMenuItem>
                 </div>
@@ -112,7 +107,11 @@
         class="grid gap-6 mt-12 md:grid-cols-2 xl:grid-cols-3"
         ref="itemsRef"
       >
-        <CarCard v-for="n in 9" :key="n" />
+        <CarCard
+          v-for="model in modelsByType"
+          :key="model.name"
+          v-bind="model"
+        />
       </div>
     </div>
   </SectionWrapper>
@@ -125,14 +124,15 @@ const breakpoints = useBreakpoints(breakpointsTailwind);
 const greaterThanLg = breakpoints.greater("lg");
 const smallerThanSm = breakpoints.smaller("sm");
 
-const countries = [
-  { name: "Китай", code: "ch" },
-  { name: "Корея", code: "kr" },
-  { name: "Япония", code: "jp" },
-  { name: "Европа", code: "eu" },
-  { name: "ОАЭ", code: "ae" },
-];
-const currentCountry = ref(countries[0].code);
+const { data } = await useFetch("/api/cars/index");
+const countries = computed(() => {
+  return Object.keys(data.value.data).map((item, index) => ({
+    name: Object.values(data.value.data)[index].name,
+    code: item,
+  }));
+});
+
+const currentCountry = ref(countries.value[0].code);
 
 const updateCurrentCountry = (payload) => {
   currentCountry.value = payload.code;
@@ -145,14 +145,20 @@ const types = [
   { name: "Хэтчбеки", value: "hatchback" },
   { name: "Купе", value: "coupe" },
 ];
-const currentType = ref(types[0].value);
+const currentType = ref(types[0]);
 
 const updateCurrentType = (payload) => {
-  currentType.value = payload.value;
+  currentType.value = payload;
 };
 
 watch(currentCountry, () => {
-  currentType.value = types[0].value;
+  currentType.value = types[0];
+});
+
+const modelsByType = computed(() => {
+  return data.value.data[currentCountry.value].models.filter(
+    (item) => item.type === currentType.value.value
+  );
 });
 
 const { $anime } = useNuxtApp();

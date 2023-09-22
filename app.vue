@@ -17,3 +17,9 @@
     <ModalCallback />
   </div>
 </template>
+
+<script setup>
+useHead({
+  title: "Автомобили под заказ - Express Auto",
+});
+</script>

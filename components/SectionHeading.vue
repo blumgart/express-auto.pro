@@ -1,7 +1,7 @@
 <template>
   <div class="relative overflow-hidden">
     <h2
-      class="relative inline-flex text-xl lg:text-4xl uppercase border border-solid border-[#868686] px-5 py-2 rounded-full overflow-hidden"
+      class="relative inline-flex text-lg sm:text-xl lg:text-4xl uppercase border border-solid border-[#868686] px-5 py-2 rounded-full overflow-hidden"
       ref="headingRef"
     >
       <span
